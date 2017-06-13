@@ -20,6 +20,7 @@ function loadData() {
     // YOUR CODE GOES HERE!
     var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
     var googleMapsBase = 'http://maps.googleapis.com/maps/api/streetview?size=600x300&location=';
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&format=json&callback=wikiCallback&search=';
     var streetName = $street.val();
     var cityName = $city.val();
     var address = streetName + ', '+cityName;
@@ -55,6 +56,22 @@ function loadData() {
       });
     }).fail(function(){
       $nytHeaderElem.text('New York Times Articles Could Not Be loaded');
+    });
+
+    // search wikipedia, append result to $wikiElem
+    $.ajax(wikiUrl+cityName,{
+      dataType: 'jsonp',
+      success: function(response){
+        var resultUrlArray = response[3];
+        var resultNameArray = response[1];
+        var $wikiList = $('<ul id="wikipedia-links">');
+        resultNameArray.forEach(function(name) {
+          var $wikiItem = $('<li>');
+          $wikiItem.html('<a href="https://en.wikipedia.org/wiki/'+name+'">'+name+'</a>');
+          $wikiList.append($wikiItem);
+        });
+        $wikiElem.append($wikiList);
+      }
     });
 
     return false;
